@@ -16,6 +16,17 @@ router.get("/logout", (req, res) => {
   res.redirect("/");
 });
 
+router.post(
+  "/login",
+  passport.authenticate("local", {
+    failureRedirect: "/auth/login",
+    failureFlash: "Wrong email or password",
+  }),
+  (req, res) => {
+    res.redirect("/profile");
+  }
+);
+
 router.post("/signup", async (req, res) => {
   console.log(req.body);
   let { name, email, password } = req.body;
@@ -24,19 +35,19 @@ router.post("/signup", async (req, res) => {
   if (emailExist) {
     req.flash("error_msg", "Email is registered by someone else");
     res.redirect("/auth/signup");
-  }
-
-  const hash = await bcrypt.hash(password, 10);
-  password = hash;
-  let newUser = new User({ name, email, password });
-  try {
-    const savedUser = await newUser.save();
-    req.flash("success_msg", "Successfully registered. You can login now.");
-    res.redirect("/auth/login");
-  } catch (err) {
-    console.log(err);
-    // req.flash("error_msg", err.errors.name.message);
-    res.redirect("/auth/signup");
+  } else {
+    const hash = await bcrypt.hash(password, 10);
+    password = hash;
+    let newUser = new User({ name, email, password });
+    try {
+      const savedUser = await newUser.save();
+      req.flash("success_msg", "Successfully registered. You can login now.");
+      res.redirect("/auth/login");
+    } catch (err) {
+      console.log(err);
+      // req.flash("error_msg", err.errors.name.message);
+      res.redirect("/auth/signup");
+    }
   }
 });
 

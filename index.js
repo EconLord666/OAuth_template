@@ -42,8 +42,9 @@ app.use(passport.session());
 app.use(flash());
 // if signup has any problem, show msg using flash
 app.use((req, res, next) => {
-  res.locals.success_msg = req.flash("sucess_msg");
+  res.locals.success_msg = req.flash("success_msg");
   res.locals.error_msg = req.flash("error_msg");
+  res.locals.error = req.flash("error");
   next();
 });
 
